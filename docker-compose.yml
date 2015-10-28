@@ -1,0 +1,20 @@
+httpd:
+    name: siil_apache
+    image: httpd:latest
+    ports:
+        - "80:80"
+
+mysql:
+    name: siil_mysql
+    image: mysql:latest
+    volumes:
+        - ~/database:/var/lib/mysql
+    environment:
+        - MYSQL_ROOT_PASSWORD=development_password
+        - MYSQL_USER=development_user
+        - MYSQL_PASSWORD=devboxpw
+        - MYSQL_DATABASE=siil
+
+redis:
+    name: siil_redis
+    image: redis:latest
