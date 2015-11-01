@@ -1,6 +1,8 @@
 httpd:
     name: siil_apache
-    image: httpd:latest
+    image: bitnami/apache
+    volumes:
+        - ./conf/apache2-vhosts:/bitnami/apache/conf/vhosts
     ports:
         - "80:80"
 
