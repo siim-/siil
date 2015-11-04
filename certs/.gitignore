@@ -1,0 +1,5 @@
+*.r0
+*.crl
+*.crt
+*.key
+*.cer

@@ -3,8 +3,10 @@ httpd:
     image: bitnami/apache
     volumes:
         - ./conf/apache2-vhosts:/bitnami/apache/conf/vhosts
+        - ./certs:/bitnami/apache/certs
     ports:
         - "80:80"
+        - "443:443"
 
 mysql:
     name: siil_mysql

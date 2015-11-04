@@ -94,6 +94,22 @@ Vagrant.configure(2) do |config|
     go install github.com/siim-/siil
 
     cd /go/src/github.com/siim-/siil
+
+    # Generate self signed cert for local development
+    mkdir certs
+    cd certs
+    sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout server.key -out server.crt -subj "/C=EE/ST=Harjumaa/L=Tallinn/O=Siil/OU=Development/CN=www.siil.lan"
+    sudo chmod +x revocationlists.sh
+    sudo chmod +x eidcert.sh
+
+    # Download eID cert
+    ./eidcert.sh
+
+    # Download revocation lists
+    ./revocationlists.sh
+
+    cd ..
+    #Bring up supporting services
     docker-compose up -d
 
   SHELL
