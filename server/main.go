@@ -21,7 +21,7 @@ func handleOptionsRequest(rw http.ResponseWriter, rq *http.Request) {
 func StartAPIServer(c *cli.Context) {
 	var (
 		baseRouter *mux.Router
-		port int = c.GlobalInt("port")
+		port       int = c.GlobalInt("port")
 	)
 
 	fmt.Printf("Starting API server on port %d...\n", port)
