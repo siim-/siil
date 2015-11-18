@@ -3,27 +3,28 @@ package cert
 import (
 	"net/http"
 	"strings"
+	"errors"
 )
 
-func NewCertFromRequest(rq *http.Request) Cert {
-	cert := Cert{}
-	if cert.Verified = clientVerified(rq); cert.Verified {
+func NewCertFromRequest(rq *http.Request) (*Cert, error) {
+	if clientVerified(rq) {
 		var userData string = getUserData(rq)
 		s := strings.Split(userData, ",")
 
+		cert := &Cert{}
 		// Serial number (EE - isikukood)
 		ss := strings.Split(s[0], "=")
 		cert.SerialNumber = ss[1]
-
 		// First name
 		ss = strings.Split(s[1], "=")
 		cert.FirstName = capitalize(ss[1])
-
 		// Last name
 		ss = strings.Split(s[2], "=")
 		cert.LastName = capitalize(ss[1])
+		return cert, nil
+	} else {
+		return nil, errors.New("Client not verified.")
 	}
-	return cert
 }
 
 func clientVerified(rq *http.Request) bool {
