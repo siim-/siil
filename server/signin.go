@@ -1,18 +1,29 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
+
+	"github.com/siim-/siil/cert"
 )
 
 type signin struct{}
 
 //Handler for the authentication endpoint
 func (s signin) ServeHTTP(rw http.ResponseWriter, rq *http.Request) {
-	if verStatus := rq.Header["SSL_CLIENT_VERIFY"]; len(verStatus) > 0 {
-		if verStatus[0] == "SUCCESS" {
-			rw.Write([]byte(rq.Header["SSL_CLIENT_S_DN"][0]))
-		} else {
-			rw.Write([]byte("Not authed!"))
-		}
+
+	cert, err := cert.NewCertFromRequest(rq)
+	if err != nil {
+		fmt.Print(err)
+		rw.Write([]byte("Not authed!"))
+		return
 	}
+
+	response := fmt.Sprintf(
+		"Hello, %s %s! You serial number is %s.",
+		cert.FirstName,
+		cert.LastName,
+		cert.SerialNumber,
+	)
+	rw.Write([]byte(response))
 }
