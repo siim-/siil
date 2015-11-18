@@ -1,9 +1,9 @@
 package cert
 
 import (
+	"errors"
 	"net/http"
 	"strings"
-	"errors"
 )
 
 func NewCertFromRequest(rq *http.Request) (*Cert, error) {
