@@ -1,18 +1,29 @@
 package server
 
 import (
-	"fmt"
+	//"fmt"
 	"net/http"
 
-	"github.com/siim-/siil/cert"
+	"github.com/gorilla/mux"
+	"github.com/siim-/siil/entity/site"
 )
 
-type signin struct{}
+type signin struct{
+	Site site.Entity
+}
 
-//Handler for the authentication endpoint
-func (s signin) ServeHTTP(rw http.ResponseWriter, rq *http.Request) {
+func handleSigninRequest(rw http.ResponseWriter, rq *http.Request) {
+	reqVars := mux.Vars(rq)
 
-	cert, err := cert.NewCertFromRequest(rq)
+	if siteId, ok := reqVars["site"]; !ok || len(siteId) == 0 {
+		http.Error(rw, "Site ID must be provided", http.StatusBadRequest)
+		return
+	} else {
+		site := site.Entity{ClientId: siteId}
+		site.Load()
+	}
+
+	/*cert, err := cert.NewCertFromRequest(rq)
 	if err != nil {
 		fmt.Print(err)
 		rw.Write([]byte("Not authed!"))
@@ -25,5 +36,5 @@ func (s signin) ServeHTTP(rw http.ResponseWriter, rq *http.Request) {
 		cert.LastName,
 		cert.SerialNumber,
 	)
-	rw.Write([]byte(response))
+	rw.Write([]byte(response))*/
 }

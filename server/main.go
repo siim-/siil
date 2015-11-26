@@ -6,7 +6,10 @@ import (
 
 	"github.com/codegangsta/cli"
 	"github.com/gorilla/mux"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/go-sql-driver/mysql"
 )
+var DB *sqlx.DB
 
 //Handle the root request
 func handleRootRequest(rw http.ResponseWriter, rq *http.Request) {
@@ -24,6 +27,10 @@ func StartAPIServer(c *cli.Context) {
 		port       int = c.GlobalInt("port")
 	)
 
+	_, err := sqlx.Connect("mysql", c.GlobalString("mysql"))
+	if err != nil {
+		fmt.Println(err)
+	}
 	fmt.Printf("Starting API server on port %d...\n", port)
 
 	baseRouter = mux.NewRouter()
@@ -32,7 +39,7 @@ func StartAPIServer(c *cli.Context) {
 	baseRouter.HandleFunc("/", handleRootRequest)
 
 	//Authentication handler for new sessions
-	baseRouter.Handle("/signin", signin{})
+	baseRouter.HandleFunc("/signin/{site:[a-zA-Z0-9]*}", handleSigninRequest)
 
 	//Invalidate sessions
 	baseRouter.Handle("/signout", signout{})

@@ -22,6 +22,11 @@ func main() {
 			Value: 8080,
 			Usage: "Port the Siil API server will be listening on",
 		},
+		cli.StringFlag{
+			Name: "mysql, m",
+			Value: "development_user:devboxpw@tcp(127.0.0.1:3306)/siil",
+			Usage: "URL for mysql connection",
+		},
 	}
 
 	app.Run(os.Args)
