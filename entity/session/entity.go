@@ -27,16 +27,25 @@ func createRandomToken() (string, error) {
 	}
 }
 
+func GetSession(token string) (*Entity, error) {
+	sess := Entity{}
+	if err := entity.DB.Get(&sess, "SELECT * FROM session WHERE token=?", token); err != nil {
+		return nil, err
+	}
+	return &sess, nil
+}
+
 func NewSession(s *site.Entity, u *user.Entity) (*Entity, error) {
 	if token, err := createRandomToken(); err != nil {
 		return nil, err
 	} else {
+		created, expires := time.Now().UTC(), time.Now().UTC().Add(time.Hour * 2)
 		sess := Entity{
 			Token:     token,
 			SiteId:    s.ClientId,
 			UserId:    u.Id,
-			CreatedAt: time.Now().UTC(),
-			ExpiresAt: time.Now().UTC().Add(time.Hour * 2),
+			CreatedAt: created,
+			ExpiresAt: expires,
 		}
 
 		if _, err := entity.DB.NamedExec("INSERT INTO session (token, site_id, user_id, created_at, expires_at) VALUES (:token, :site_id, :user_id, :created_at, :expires_at)", &sess); err != nil {

@@ -90,3 +90,26 @@ func handleSessionCreation(rw http.ResponseWriter, rq *http.Request) {
 		}
 	}
 }
+
+func handleSuccessRequest(rw http.ResponseWriter, rq *http.Request) {
+	if (rq.Method != "POST") {
+		http.Error(rw, "Method not allowed", http.StatusMethodNotAllowed)
+	} else {
+		if token := rq.FormValue("token"); len(token) == 0 {
+			http.Error(rw, "Invalid token provided", http.StatusBadRequest)
+		} else {
+			if sess, err := session.GetSession(token); err != nil {
+				log.Fatal(err)
+				http.Error(rw, "No session", http.StatusUnauthorized)
+			} else {
+				cookie := http.Cookie{
+					Name: "token",
+					Value: token,
+					Expires: sess.ExpiresAt,
+				}
+				http.SetCookie(rw, &cookie)
+				http.Redirect(rw, rq, "/", http.StatusFound)
+			}
+		}
+	}
+}

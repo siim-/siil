@@ -30,7 +30,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:  "mysql, m",
-			Value: "development_user:devboxpw@tcp(127.0.0.1:3306)/siil",
+			Value: "development_user:devboxpw@tcp(127.0.0.1:3306)/siil?parseTime=true",
 			Usage: "URL for mysql connection",
 		},
 		cli.StringFlag{

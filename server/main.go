@@ -16,15 +16,6 @@ import (
 
 var templates map[string]*raymond.Template = make(map[string]*raymond.Template)
 
-//Handle the root request
-func handleRootRequest(rw http.ResponseWriter, rq *http.Request) {
-	rw.Write([]byte("Hello from Siil!"))
-}
-
-func handleOptionsRequest(rw http.ResponseWriter, rq *http.Request) {
-	rw.Write([]byte("Hello from Siil options!"))
-}
-
 //Initialize the Siil API server
 func StartAPIServer(c *cli.Context) {
 	var (
@@ -56,13 +47,23 @@ func StartAPIServer(c *cli.Context) {
 
 	//Root endpoint doesn't really do anything
 	baseRouter.HandleFunc("/", handleRootRequest)
+	baseRouter.HandleFunc("/success", handleSuccessRequest)
 
 	//User primer & authentication handler
-	baseRouter.HandleFunc("/signin/{site:[a-zA-Z0-9]*}", handleSigninRequest)
-	baseRouter.HandleFunc("/id/{site:[a-zA-Z0-9]*}", handleSessionCreation)
+	baseRouter.HandleFunc("/api/signin/{site:[a-zA-Z0-9]*}", handleSigninRequest)
+	baseRouter.HandleFunc("/api/id/{site:[a-zA-Z0-9]*}", handleSessionCreation)
 
 	//Invalidate sessions
-	baseRouter.Handle("/signout", signout{})
+	baseRouter.Handle("/api/signout", signout{})
 
 	http.ListenAndServe(fmt.Sprintf(":%d", port), baseRouter)
+}
+
+//Handle the root request
+func handleRootRequest(rw http.ResponseWriter, rq *http.Request) {
+	if t, err := templates["index.hbs"].Exec(map[string]interface{}{}); err != nil {
+		http.Error(rw, "Something broker", http.StatusInternalServerError)
+	} else {
+		rw.Write([]byte(t))
+	}
 }
