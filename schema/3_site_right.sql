@@ -1,8 +1,0 @@
-DROP TABLE IF EXISTS site_right;
-CREATE TABLE site_right (
-	site_id CHAR(64) NOT NULL,
-	user_id INTEGER UNSIGNED NOT NULL,
-	PRIMARY KEY (site_id, user_id),
-	CONSTRAINT FK_site_right_site FOREIGN KEY (site_id) REFERENCES site (client_id) ON UPDATE CASCADE ON DELETE CASCADE,
-	CONSTRAINT FK_site_right_user FOREIGN KEY (user_id) REFERENCES user (id) ON UPDATE CASCADE ON DELETE CASCADE
-)
