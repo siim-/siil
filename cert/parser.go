@@ -7,7 +7,7 @@ import (
 )
 
 func NewCertFromRequest(rq *http.Request) (*Cert, error) {
-	if clientVerified(rq) {
+	if ClientVerified(rq) {
 		var userData string = getUserData(rq)
 		s := strings.Split(userData, ",")
 
@@ -27,7 +27,7 @@ func NewCertFromRequest(rq *http.Request) (*Cert, error) {
 	}
 }
 
-func clientVerified(rq *http.Request) bool {
+func ClientVerified(rq *http.Request) bool {
 	if verStatus := rq.Header["SSL_CLIENT_VERIFY"]; len(verStatus) > 0 {
 		if verStatus[0] == "SUCCESS" {
 			return true

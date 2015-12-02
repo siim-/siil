@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>{{Name}} needs your info!</title>
+		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+	</head>
+	<body>
+		<div class="container" style="border-right: 1px solid #ccc;border-left: 1px solid #ccc;">
+			<div class="row">
+				<div class="twelve columns" style="padding-left:15px;">
+				<h4>Sign in to {{Name}}</h4>
+				<div class="row">
+					<div class="twelve columns" style="text-align:left;">
+						<p>
+							{{Name}} ({{Domain}}) uses the Estonian ID card to authenticate users. Your full name & national id code will be provided to {{Name}} if you choose to continue.
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="four columns" style="text-align:center;">
+					<form action="/api/id/{{ClientId}}" method="POST">
+						<button class="button-primary">Authenticate with eID</button>
+					</form>
+				</div>
+				<div class="four columns" style="text-align:center;">
+					<button class="button disabled" type="button" disabled>Authenticate with mID</button>
+				</div>
+				<div class="four columns" style="text-align:center;">
+					<form action="{{CancelURL}}">
+						<button class="button" type="submit">Cancel</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
