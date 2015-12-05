@@ -14,10 +14,6 @@ import (
 	"github.com/siim-/siil/entity/user"
 )
 
-type signin struct {
-	Site site.Entity
-}
-
 func handleSigninRequest(rw http.ResponseWriter, rq *http.Request) {
 	reqVars := mux.Vars(rq)
 

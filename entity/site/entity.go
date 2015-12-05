@@ -1,7 +1,10 @@
 package site
 
 import (
+	"log"
+
 	"github.com/siim-/siil/entity"
+	"github.com/siim-/siil/entity/user"
 )
 
 const (
@@ -28,4 +31,20 @@ func (e *Entity) Load() error {
 	}
 	*e = loaded
 	return nil
+}
+
+//Does the user have any active sessions for the site?
+func (e *Entity) HasActiveSessionFor(u *user.Entity) bool {
+	_, err := entity.DB.NamedExec(
+		"SELECT * FROM session WHERE user_id = :user AND site_id = :site AND expires_at > NOW()",
+		map[string]interface{}{
+			"site": e.ClientId,
+			"user": u.Id,
+		},
+	)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	return true
 }

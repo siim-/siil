@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/siim-/siil/cert"
 	"github.com/siim-/siil/entity/session"
 	"github.com/siim-/siil/entity/site"
 	"github.com/siim-/siil/entity/user"
@@ -75,6 +76,7 @@ func handleAPISessionRequest(rw http.ResponseWriter, rq *http.Request) {
 							}
 
 							enc := json.NewEncoder(rw)
+							rw.Header().Set("Content-Type", "application/json")
 							if err := enc.Encode(response); err != nil {
 								log.Println(err)
 								http.Error(rw, "Failed to compose response", http.StatusInternalServerError)
@@ -89,5 +91,39 @@ func handleAPISessionRequest(rw http.ResponseWriter, rq *http.Request) {
 
 //Provide information about the active id card user
 func handleAPIMeRequest(rw http.ResponseWriter, rq *http.Request) {
-
+	if rq.Method != "GET" {
+		http.Error(rw, "Method not allowed", http.StatusMethodNotAllowed)
+	} else {
+		if !cert.ClientVerified(rq) {
+			http.Error(rw, "Certificate not provided", http.StatusBadRequest)
+		} else {
+			if c, err := cert.NewCertFromRequest(rq); err != nil {
+				http.Error(rw, "Certificate not provided", http.StatusBadRequest)
+			} else {
+				if clientId := rq.FormValue("client_id"); len(clientId) == 0 {
+					http.Error(rw, "Invalid client_id provided", http.StatusBadRequest)
+				} else {
+					s := site.Entity{ClientId: clientId}
+					if err := s.Load(); err != nil {
+						http.Error(rw, "Invalid client_id provided", http.StatusBadRequest)
+						return
+					}
+					if usr, err := user.Find(c); err != nil {
+						http.Error(rw, "Looks like we don't know you", http.StatusUnauthorized)
+					} else {
+						if s.HasActiveSessionFor(usr) {
+							enc := json.NewEncoder(rw)
+							rw.Header().Set("Content-Type", "application/json")
+							if err := enc.Encode(usr); err != nil {
+								log.Println(err)
+								http.Error(rw, "Failed to compose response", http.StatusInternalServerError)
+							}
+						} else {
+							http.Error(rw, "Computer says no", http.StatusUnauthorized)
+						}
+					}
+				}
+			}
+		}
+	}
 }
