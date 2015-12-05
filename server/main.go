@@ -7,6 +7,8 @@ import (
 	"net/http"
 
 	"github.com/siim-/siil/entity"
+	"github.com/siim-/siil/entity/session"
+	"github.com/siim-/siil/entity/site"
 
 	"github.com/aymerick/raymond"
 	"github.com/codegangsta/cli"
@@ -43,15 +45,17 @@ func StartAPIServer(c *cli.Context) {
 		}
 	}
 
+	site.SIIL_SITE_ID = c.GlobalString("sid")
+
 	baseRouter = mux.NewRouter()
 
 	//Root endpoint doesn't really do anything
 	baseRouter.HandleFunc("/", handleRootRequest)
 	baseRouter.HandleFunc("/success", handleSuccessRequest)
 
-	//User primer & authentication handler
-	baseRouter.HandleFunc("/api/signin/{site:[a-zA-Z0-9]*}", handleSigninRequest)
-	baseRouter.HandleFunc("/api/id/{site:[a-zA-Z0-9]*}", handleSessionCreation)
+	//User primer & authentication handlers
+	baseRouter.HandleFunc("/signin/{site:[a-zA-Z0-9]*}", handleSigninRequest)
+	baseRouter.HandleFunc("/id/{site:[a-zA-Z0-9]*}", handleSessionCreation)
 
 	//New site creation
 	baseRouter.HandleFunc("/addsite", handleAddSiteForm)
@@ -60,15 +64,27 @@ func StartAPIServer(c *cli.Context) {
 	baseRouter.HandleFunc("/addsite/request", handleAddSiteRequest)
 
 	//Invalidate sessions
-	baseRouter.Handle("/api/signout", signout{})
+	baseRouter.HandleFunc("/signout/{token:[a-zA-Z0-9]*}", handleSignoutRequest)
+
+	baseRouter.HandleFunc("/api/session/{token:[a-zA-Z0-9]*}", handleAPISessionRequest)
+	baseRouter.HandleFunc("/api/me", handleAPIMeRequest)
 
 	http.ListenAndServe(fmt.Sprintf(":%d", port), baseRouter)
 }
 
 //Handle the root request
 func handleRootRequest(rw http.ResponseWriter, rq *http.Request) {
-	if t, err := templates["index.hbs"].Exec(map[string]interface{}{}); err != nil {
-		http.Error(rw, "Something broker", http.StatusInternalServerError)
+	//Detect if the user is authenticated with Siil
+	authenticated := false
+	token := ""
+	if tokenCookie, err := rq.Cookie("token"); err == nil {
+		token = tokenCookie.Value
+		if sess, err := session.GetSession(token); err == nil {
+			authenticated = sess.SiteId == site.SIIL_SITE_ID
+		}
+	}
+	if t, err := templates["index.hbs"].Exec(map[string]interface{}{"authed": authenticated, "site_id": site.SIIL_SITE_ID, "token": token}); err != nil {
+		http.Error(rw, "Something broke", http.StatusInternalServerError)
 	} else {
 		rw.Write([]byte(t))
 	}
