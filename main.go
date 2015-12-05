@@ -13,7 +13,7 @@ func main() {
 	app := cli.NewApp()
 
 	app.Name = "siil"
-	app.Usage = "eID OAuth2 provider"
+	app.Usage = "eID authentication provider"
 
 	app.Action = server.StartAPIServer
 
@@ -36,7 +36,12 @@ func main() {
 		cli.StringFlag{
 			Name:  "working-directory, wd",
 			Value: wd,
-			Usage: "URL for mysql connection",
+			Usage: "Working directory for the application",
+		},
+		cli.StringFlag{
+			Name: "site-id, sid",
+			Value: "a1s2d34",
+			Usage: "Site ID for the Siil entry",
 		},
 	}
 

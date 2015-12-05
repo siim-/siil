@@ -4,9 +4,20 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
+	"log"
 	"regexp"
 
 	"github.com/siim-/siil/entity"
+	"github.com/siim-/siil/entity/user"
+)
+
+const (
+	CLIENT_ID_LENGTH   = 64
+	PRIVATE_KEY_LENGTH = 128
+)
+
+var (
+	SIIL_SITE_ID string
 )
 
 //The site entity
@@ -37,6 +48,22 @@ func (e *Entity) Load() error {
 	}
 	*e = loaded
 	return nil
+}
+
+//Does the user have any active sessions for the site?
+func (e *Entity) HasActiveSessionFor(u *user.Entity) bool {
+	_, err := entity.DB.NamedExec(
+		"SELECT * FROM session WHERE user_id = :user AND site_id = :site AND expires_at > NOW()",
+		map[string]interface{}{
+			"site": e.ClientId,
+			"user": u.Id,
+		},
+	)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	return true
 }
 
 func NewSite(entry *Entry) (*Entity, error) {

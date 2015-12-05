@@ -28,11 +28,11 @@ func handleAddSiteSuccess(rw http.ResponseWriter, rq *http.Request) {
 func handleAddSiteRequest(rw http.ResponseWriter, rq *http.Request) {
 	var queryParams url.Values = rq.URL.Query()
 
-	owner, err := getOwnerFromSession(rq);
+	owner, err := getOwnerFromSession(rq)
 	if err != nil {
 		fmt.Println(err)
 		http.Redirect(rw, rq, "/addsite/fail", http.StatusFound)
-		return;
+		return
 	}
 
 	if len(queryParams) != 0 {
@@ -57,7 +57,7 @@ func handleAddSiteRequest(rw http.ResponseWriter, rq *http.Request) {
 func addForm(rw http.ResponseWriter, rq *http.Request, lastFailed bool) {
 	response, err := templates["addsite.hbs"].Exec(map[string]interface{}{
 		"lastFailed": lastFailed,
-	})	
+	})
 	if err != nil {
 		http.Error(rw, "Something broke", http.StatusInternalServerError)
 		return
