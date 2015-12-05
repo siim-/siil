@@ -53,6 +53,12 @@ func StartAPIServer(c *cli.Context) {
 	baseRouter.HandleFunc("/api/signin/{site:[a-zA-Z0-9]*}", handleSigninRequest)
 	baseRouter.HandleFunc("/api/id/{site:[a-zA-Z0-9]*}", handleSessionCreation)
 
+	//New site creation
+	baseRouter.HandleFunc("/addsite", handleAddSiteForm)
+	baseRouter.HandleFunc("/addsite/fail", handleAddSiteFormFailed)
+	baseRouter.HandleFunc("/addsite/success", handleAddSiteSuccess)
+	baseRouter.HandleFunc("/addsite/request", handleAddSiteRequest)
+
 	//Invalidate sessions
 	baseRouter.Handle("/api/signout", signout{})
 
