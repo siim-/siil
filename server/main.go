@@ -7,6 +7,8 @@ import (
 	"net/http"
 
 	"github.com/siim-/siil/entity"
+	"github.com/siim-/siil/entity/session"
+	"github.com/siim-/siil/entity/site"
 
 	"github.com/aymerick/raymond"
 	"github.com/codegangsta/cli"
@@ -43,6 +45,8 @@ func StartAPIServer(c *cli.Context) {
 		}
 	}
 
+	site.SIIL_SITE_ID = c.GlobalString("sid")
+
 	baseRouter = mux.NewRouter()
 
 	//Root endpoint doesn't really do anything
@@ -70,7 +74,16 @@ func StartAPIServer(c *cli.Context) {
 
 //Handle the root request
 func handleRootRequest(rw http.ResponseWriter, rq *http.Request) {
-	if t, err := templates["index.hbs"].Exec(map[string]interface{}{}); err != nil {
+	//Detect if the user is authenticated with Siil
+	authenticated := false
+	token := ""
+	if tokenCookie, err := rq.Cookie("token"); err == nil {
+		token = tokenCookie.Value
+		if sess, err := session.GetSession(token); err == nil {
+			authenticated = sess.SiteId == site.SIIL_SITE_ID
+		}
+	}
+	if t, err := templates["index.hbs"].Exec(map[string]interface{}{"authed": authenticated, "site_id": site.SIIL_SITE_ID, "token": token}); err != nil {
 		http.Error(rw, "Something broke", http.StatusInternalServerError)
 	} else {
 		rw.Write([]byte(t))

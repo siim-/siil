@@ -1,10 +1,10 @@
 package site
 
 import (
-	"log"
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
+	"log"
 	"regexp"
 
 	"github.com/siim-/siil/entity"
@@ -14,6 +14,10 @@ import (
 const (
 	CLIENT_ID_LENGTH   = 64
 	PRIVATE_KEY_LENGTH = 128
+)
+
+var (
+	SIIL_SITE_ID string
 )
 
 //The site entity
