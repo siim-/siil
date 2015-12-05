@@ -60,6 +60,7 @@ func (e *Entity) HasActiveSessionFor(u *user.Entity) bool {
 		return false
 	}
 	return true
+}
 
 func NewSite(entry *Entry) (*Entity, error) {
 	if validEntry(entry) {
