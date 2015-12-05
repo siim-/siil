@@ -10,6 +10,10 @@ import (
 	"github.com/siim-/siil/entity/user"
 )
 
+const (
+	TOKEN_LENGTH = 64
+)
+
 type Entity struct {
 	Token     string
 	SiteId    string    `db:"site_id"`
@@ -18,8 +22,16 @@ type Entity struct {
 	ExpiresAt time.Time `db:"expires_at"`
 }
 
+//Remove the session
+func (e Entity) Delete() error {
+	if _, err := entity.DB.NamedQuery("DELETE FROM session WHERE token = :t", map[string]interface{}{"t": e.Token}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func createRandomToken() (string, error) {
-	var buffer []byte = make([]byte, hex.DecodedLen(64))
+	var buffer []byte = make([]byte, hex.DecodedLen(TOKEN_LENGTH))
 	if _, err := rand.Read(buffer); err != nil {
 		return "", err
 	} else {
@@ -35,14 +47,16 @@ func clearStaleSessions(u *user.Entity) error {
 	return nil
 }
 
+//Get an active session
 func GetSession(token string) (*Entity, error) {
 	sess := Entity{}
-	if err := entity.DB.Get(&sess, "SELECT * FROM session WHERE token=?", token); err != nil {
+	if err := entity.DB.Get(&sess, "SELECT * FROM session WHERE token=? AND expires_at > NOW()", token); err != nil {
 		return nil, err
 	}
 	return &sess, nil
 }
 
+//Create a new session
 func NewSession(s *site.Entity, u *user.Entity) (*Entity, error) {
 	if token, err := createRandomToken(); err != nil {
 		return nil, err

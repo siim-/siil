@@ -54,7 +54,10 @@ func StartAPIServer(c *cli.Context) {
 	baseRouter.HandleFunc("/id/{site:[a-zA-Z0-9]*}", handleSessionCreation)
 
 	//Invalidate sessions
-	baseRouter.Handle("/signout", signout{})
+	baseRouter.HandleFunc("/signout/{token:[a-zA-Z0-9]*}", handleSignoutRequest)
+
+	baseRouter.HandleFunc("/api/session/{token:[a-zA-Z0-9]*}", handleAPISessionRequest)
+	baseRouter.HandleFunc("/api/me", handleAPIMeRequest)
 
 	http.ListenAndServe(fmt.Sprintf(":%d", port), baseRouter)
 }
@@ -62,7 +65,7 @@ func StartAPIServer(c *cli.Context) {
 //Handle the root request
 func handleRootRequest(rw http.ResponseWriter, rq *http.Request) {
 	if t, err := templates["index.hbs"].Exec(map[string]interface{}{}); err != nil {
-		http.Error(rw, "Something broker", http.StatusInternalServerError)
+		http.Error(rw, "Something broke", http.StatusInternalServerError)
 	} else {
 		rw.Write([]byte(t))
 	}

@@ -4,6 +4,11 @@ import (
 	"github.com/siim-/siil/entity"
 )
 
+const (
+	CLIENT_ID_LENGTH   = 64
+	PRIVATE_KEY_LENGTH = 128
+)
+
 //The site entity
 type Entity struct {
 	ClientId    string `db:"client_id"`

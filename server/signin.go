@@ -3,7 +3,9 @@ package server
 import (
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/siim-/siil/cert"
@@ -78,12 +80,19 @@ func handleSessionCreation(rw http.ResponseWriter, rq *http.Request) {
 						log.Println(err)
 						http.Error(rw, "Something broke", http.StatusInternalServerError)
 					} else {
-
-						if t, err := templates["success.hbs"].Exec(map[string]string{"token": sess.Token, "callback": wanted.CallbackURL}); err != nil {
-							log.Println(err)
-							http.Error(rw, "Something broke", http.StatusInternalServerError)
+						if callback, err := url.Parse(wanted.CallbackURL); err != nil {
+							http.Error(rw, "Invalid callback URL provided", http.StatusInternalServerError)
 						} else {
-							rw.Write([]byte(t))
+							//Indicate signin action with GET parameter
+							q := callback.Query()
+							q.Set("siil_action", "signin")
+							callback.RawQuery = q.Encode()
+							if t, err := templates["success.hbs"].Exec(map[string]string{"token": sess.Token, "callback": callback.String()}); err != nil {
+								log.Println(err)
+								http.Error(rw, "Something broke", http.StatusInternalServerError)
+							} else {
+								rw.Write([]byte(t))
+							}
 						}
 					}
 				}
@@ -96,21 +105,36 @@ func handleSuccessRequest(rw http.ResponseWriter, rq *http.Request) {
 	if rq.Method != "POST" {
 		http.Error(rw, "Method not allowed", http.StatusMethodNotAllowed)
 	} else {
-		if token := rq.FormValue("token"); len(token) == 0 {
-			http.Error(rw, "Invalid token provided", http.StatusBadRequest)
-		} else {
-			if sess, err := session.GetSession(token); err != nil {
-				log.Fatal(err)
-				http.Error(rw, "No session", http.StatusUnauthorized)
+		switch rq.FormValue("siil_action") {
+		case "signin":
+			if token := rq.FormValue("token"); len(token) != session.TOKEN_LENGTH {
+				http.Error(rw, "Invalid token provided", http.StatusBadRequest)
 			} else {
-				cookie := http.Cookie{
-					Name:    "token",
-					Value:   token,
-					Expires: sess.ExpiresAt,
+				if sess, err := session.GetSession(token); err != nil {
+					log.Fatal(err)
+					http.Error(rw, "No session", http.StatusUnauthorized)
+				} else {
+					cookie := http.Cookie{
+						Name:    "token",
+						Value:   token,
+						Expires: sess.ExpiresAt,
+					}
+					http.SetCookie(rw, &cookie)
+					http.Redirect(rw, rq, "/", http.StatusFound)
 				}
-				http.SetCookie(rw, &cookie)
-				http.Redirect(rw, rq, "/", http.StatusFound)
 			}
+		case "signout":
+			//Just clear the token cookie
+			cookie := http.Cookie{
+				Name:    "token",
+				Value:   "lel",
+				Expires: time.Now().UTC().Add(time.Minute * -2),
+			}
+			http.SetCookie(rw, &cookie)
+			http.Redirect(rw, rq, "/", http.StatusFound)
+		default:
+			http.Error(rw, "Invalid action provided", http.StatusBadRequest)
 		}
+
 	}
 }
