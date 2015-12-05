@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Siil - Add a Site</title>
+		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<br><br>
+				<h1>Add a site</h1>
+				{{#if lastFailed}}
+					<p style="color: red">Entered fields were bad.</p>
+				{{/if}}
+				<form action="/addsite/request">
+				  Site name:<br>
+				  <input type="text" name="site-name">
+				  <br>
+				  Domain name:<br>
+				  <input type="text" name="domain-name">
+				  <br>
+				  Callback url:<br>
+				  <input type="text" name="callback-url">
+				  <br>
+				  Cancel url:<br>
+				  <input type="text" name="cancel-url">
+				  <br><br>
+				  <input type="submit" value="Submit">
+				</form>
+			</div>
+		</div>
+	</body>
+</html>
