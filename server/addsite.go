@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/siim-/siil/entity/session"
 	"github.com/siim-/siil/entity/site"
 )
 
@@ -64,34 +63,11 @@ func handleAddSiteRequest(rw http.ResponseWriter, rq *http.Request) {
 
 func addForm(rw http.ResponseWriter, rq *http.Request, displayError bool) {
 	response, err := templates["addsite.hbs"].Exec(map[string]interface{}{
-		"displayError": displayError,
+		"DisplayError": displayError,
 	})
 	if err != nil {
 		http.Error(rw, "Something broke", http.StatusInternalServerError)
 		return
 	}
 	rw.Write([]byte(response))
-}
-
-func getOwnerFromSession(rq *http.Request) (uint, error) {
-	cookie, err := rq.Cookie("token")
-	if err != nil {
-		return 0, err
-	}
-
-	session, err := session.GetSession(cookie.Value)
-	if err != nil {
-		return 0, err
-	}
-
-	return uint(session.UserId), nil
-}
-
-func userLoggedIn(rq *http.Request) bool {
-	_, err := getOwnerFromSession(rq)
-	if err != nil {
-		return false
-	} else {
-		return true
-	}
 }

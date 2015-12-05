@@ -3,6 +3,37 @@
 	<head>
 		<title>Siil - eID OAuth provider</title>
 		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+
+		<style type="text/css">
+
+		dl {
+			line-height: inherit;
+			margin-bottom: 65px;
+			margin-top: 25px;
+		}
+
+		dl h3 {
+			font-size: 3.6rem;
+			color: #1D1D1D;
+		}
+
+		dl dt {
+			text-transform: uppercase;
+			margin-bottom: 0;
+			font-weight: 900;
+			font-size: 0.81em;
+			color: #3E3E3E;
+		}
+
+		dl dd {
+			margin-bottom: 30px;
+			margin-left: 0;
+			font-size: .92em;
+			word-wrap: break-word;
+		}
+
+		</style>
+
 	</head>
 	<body>
 		<div class="container">
@@ -15,33 +46,9 @@
 				</div>
 			</div>
 			<div class="row">
-				<table>
-					<thead>
-						<tr>
-							<td>Client ID</td>
-							<td>Private Key</td>
-							<td>Name</td>
-							<td>Domain</td>
-							<td>Callback URL</td>
-							<td>Cancel URL</td>
-							<td></td>
-						</tr>
-					</thead>
-
-					<tbody>
-						<tr>
-							<td>blabla</td>
-							<td>joujou</td>
-							<td>TereTere</td>
-							<td>dustland.ee</td>
-							<td>https pläma</td>
-							<td>siia ka/td>
-							<td>
-								<a class="button button-primary" href="/sites">Edit</a>
-							</td>
-						</tr>
-					</tbody>
-				</table>
+				<div class="twelve columns">
+					{{{Sections}}}
+				</div>				
 			</div>
 		</div>
 	</body>
