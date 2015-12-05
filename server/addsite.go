@@ -62,9 +62,9 @@ func handleAddSiteRequest(rw http.ResponseWriter, rq *http.Request) {
 	http.Redirect(rw, rq, "/addsite/fail", http.StatusFound)
 }
 
-func addForm(rw http.ResponseWriter, rq *http.Request, lastFailed bool) {
+func addForm(rw http.ResponseWriter, rq *http.Request, displayError bool) {
 	response, err := templates["addsite.hbs"].Exec(map[string]interface{}{
-		"lastFailed": lastFailed,
+		"displayError": displayError,
 	})
 	if err != nil {
 		http.Error(rw, "Something broke", http.StatusInternalServerError)
