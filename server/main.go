@@ -49,12 +49,12 @@ func StartAPIServer(c *cli.Context) {
 	baseRouter.HandleFunc("/", handleRootRequest)
 	baseRouter.HandleFunc("/success", handleSuccessRequest)
 
-	//User primer & authentication handler
-	baseRouter.HandleFunc("/api/signin/{site:[a-zA-Z0-9]*}", handleSigninRequest)
-	baseRouter.HandleFunc("/api/id/{site:[a-zA-Z0-9]*}", handleSessionCreation)
+	//User primer & authentication handlers
+	baseRouter.HandleFunc("/signin/{site:[a-zA-Z0-9]*}", handleSigninRequest)
+	baseRouter.HandleFunc("/id/{site:[a-zA-Z0-9]*}", handleSessionCreation)
 
 	//Invalidate sessions
-	baseRouter.Handle("/api/signout", signout{})
+	baseRouter.Handle("/signout", signout{})
 
 	http.ListenAndServe(fmt.Sprintf(":%d", port), baseRouter)
 }

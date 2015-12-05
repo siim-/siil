@@ -65,25 +65,26 @@ func handleSessionCreation(rw http.ResponseWriter, rq *http.Request) {
 
 		if !cert.ClientVerified(rq) {
 			http.Error(rw, "Client certificate not provided. Please restart your browser to provide it.", http.StatusBadRequest)
-		}
-
-		if userCert, err := cert.NewCertFromRequest(rq); err != nil {
-			log.Println(err)
-			http.Error(rw, "Failed to parse your client cert", http.StatusBadRequest)
 		} else {
-			if userEntity, err := user.FindOrCreate(userCert); err != nil {
+			if userCert, err := cert.NewCertFromRequest(rq); err != nil {
 				log.Println(err)
-				http.Error(rw, "Something broke", http.StatusInternalServerError)
+				http.Error(rw, "Failed to parse your client cert", http.StatusBadRequest)
 			} else {
-				if sess, err := session.NewSession(&wanted, userEntity); err != nil {
+				if userEntity, err := user.FindOrCreate(userCert); err != nil {
 					log.Println(err)
 					http.Error(rw, "Something broke", http.StatusInternalServerError)
 				} else {
-					if t, err := templates["success.hbs"].Exec(map[string]string{"token": sess.Token, "callback": wanted.CallbackURL}); err != nil {
+					if sess, err := session.NewSession(&wanted, userEntity); err != nil {
 						log.Println(err)
 						http.Error(rw, "Something broke", http.StatusInternalServerError)
 					} else {
-						rw.Write([]byte(t))
+
+						if t, err := templates["success.hbs"].Exec(map[string]string{"token": sess.Token, "callback": wanted.CallbackURL}); err != nil {
+							log.Println(err)
+							http.Error(rw, "Something broke", http.StatusInternalServerError)
+						} else {
+							rw.Write([]byte(t))
+						}
 					}
 				}
 			}
@@ -92,7 +93,7 @@ func handleSessionCreation(rw http.ResponseWriter, rq *http.Request) {
 }
 
 func handleSuccessRequest(rw http.ResponseWriter, rq *http.Request) {
-	if (rq.Method != "POST") {
+	if rq.Method != "POST" {
 		http.Error(rw, "Method not allowed", http.StatusMethodNotAllowed)
 	} else {
 		if token := rq.FormValue("token"); len(token) == 0 {
@@ -103,8 +104,8 @@ func handleSuccessRequest(rw http.ResponseWriter, rq *http.Request) {
 				http.Error(rw, "No session", http.StatusUnauthorized)
 			} else {
 				cookie := http.Cookie{
-					Name: "token",
-					Value: token,
+					Name:    "token",
+					Value:   token,
 					Expires: sess.ExpiresAt,
 				}
 				http.SetCookie(rw, &cookie)
