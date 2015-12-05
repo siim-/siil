@@ -92,7 +92,7 @@ func handleSessionCreation(rw http.ResponseWriter, rq *http.Request) {
 }
 
 func handleSuccessRequest(rw http.ResponseWriter, rq *http.Request) {
-	if (rq.Method != "POST") {
+	if rq.Method != "POST" {
 		http.Error(rw, "Method not allowed", http.StatusMethodNotAllowed)
 	} else {
 		if token := rq.FormValue("token"); len(token) == 0 {
@@ -103,8 +103,8 @@ func handleSuccessRequest(rw http.ResponseWriter, rq *http.Request) {
 				http.Error(rw, "No session", http.StatusUnauthorized)
 			} else {
 				cookie := http.Cookie{
-					Name: "token",
-					Value: token,
+					Name:    "token",
+					Value:   token,
 					Expires: sess.ExpiresAt,
 				}
 				http.SetCookie(rw, &cookie)
