@@ -91,7 +91,7 @@ Vagrant.configure(2) do |config|
     sudo chown -R vagrant:vagrant /go
     sudo chown -R vagrant:vagrant /usr/local/go
 
-    go install github.com/siim-/siil
+    go get github.com/siim-/siil
 
     cd /go/src/github.com/siim-/siil
 
@@ -109,6 +109,14 @@ Vagrant.configure(2) do |config|
     ./revocationlists.sh
 
     cd ..
+
+    #Set the correct docker-compose file
+    cp docker-compose.yml.dev docker-compose.yml
+
+    #And apache2 conf
+    cp conf/apache2-vhosts/siil.conf.dev conf/apache2-vhosts/active/siil.conf
+
+    cp conf/apache2-vhosts/siil.conf.dev
     #Bring up supporting services
     docker-compose up -d
 

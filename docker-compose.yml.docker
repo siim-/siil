@@ -1,8 +1,10 @@
 httpd:
     name: siil_apache
     image: bitnami/apache
+    links:
+        - siil
     volumes:
-        - ./conf/apache2-vhosts:/bitnami/apache/conf/vhosts
+        - ./conf/apache2-vhosts/active:/bitnami/apache/conf/vhosts
         - ./certs:/bitnami/apache/certs
     ports:
         - "80:80"
@@ -11,8 +13,6 @@ httpd:
 mysql:
     name: siil_mysql
     image: mysql:latest
-    ports:
-        - "3306:3306"
     volumes:
         - ~/database:/var/lib/mysql
     environment:
@@ -21,6 +21,11 @@ mysql:
         - MYSQL_PASSWORD=devboxpw
         - MYSQL_DATABASE=siil
 
-redis:
-    name: siil_redis
-    image: redis:latest
+siil:
+    name: siil_sso
+    build: .
+    links:
+        - mysql
+    environment:
+        - SITE_ID=a1s2d34
+        - MYSQL_URI=development_user:devboxpw@tcp(mysql:3306)/siil?parseTime=true
