@@ -42,11 +42,19 @@ type Entry struct {
 
 func (e *Entity) Load() error {
 	loaded := Entity{}
-	err := entity.DB.Get(&loaded, "SELECT * FROM site WHERE client_id=?", e.ClientId)
-	if err != nil {
-		return err
+	switch {
+	case len(e.ClientId) != 0:
+		if err := entity.DB.Get(&loaded, "SELECT * FROM site WHERE client_id=?", e.ClientId); err != nil {
+			return err
+		}
+		*e = loaded
+	case len(e.Domain) != 0:
+		if err := entity.DB.Get(&loaded, "SELECT * FROM site WHERE domain=?", e.Domain); err != nil {
+			return err
+		}
+		*e = loaded
 	}
-	*e = loaded
+
 	return nil
 }
 
