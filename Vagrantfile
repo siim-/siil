@@ -91,7 +91,7 @@ Vagrant.configure(2) do |config|
     sudo chown -R vagrant:vagrant /go
     sudo chown -R vagrant:vagrant /usr/local/go
 
-    go install github.com/siim-/siil
+    go get github.com/siim-/siil
 
     cd /go/src/github.com/siim-/siil
 
