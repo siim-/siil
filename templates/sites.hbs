@@ -6,9 +6,21 @@
 
 		<style type="text/css">
 
+		h2 {
+			margin-bottom: 40px;
+		}
+
+		div.columns h3,
+		div.columns form {
+			margin-bottom: 0;
+		}
+
+		section + section {
+			margin-top: 45px;
+		}
+
 		dl {
 			line-height: inherit;
-			margin-bottom: 65px;
 			margin-top: 25px;
 		}
 
@@ -50,11 +62,7 @@
 					<h2>My sites</h2>
 				</div>
 			</div>
-			<div class="row">
-				<div class="twelve columns">
-					{{{Sections}}}
-				</div>				
-			</div>
+			{{{Sections}}}
 		</div>
 	</body>
 </html>

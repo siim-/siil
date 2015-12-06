@@ -33,6 +33,7 @@ type Entity struct {
 
 //The site entry
 type Entry struct {
+	ClientId    string
 	Owner       uint
 	Name        string
 	Domain      string
@@ -96,6 +97,27 @@ func NewSite(entry *Entry) (*Entity, error) {
 		}
 
 		if _, err := entity.DB.NamedExec("INSERT INTO site (client_id, private_id, owner, name, domain, callback_url, cancel_url) VALUES (:client_id, :private_id, :owner, :name, :domain, :callback_url, :cancel_url)", &site); err != nil {
+			return nil, err
+		}
+
+		return &site, nil
+	} else {
+		return nil, errors.New("Invalid entry.")
+	}
+}
+
+func EditSite(entry *Entry) (*Entity, error) {
+	if validEntry(entry) {
+		site := Entity{
+			ClientId:    entry.ClientId,
+			Owner:       entry.Owner,
+			Name:        entry.Name,
+			Domain:      entry.Domain,
+			CallbackURL: entry.CallbackURL,
+			CancelURL:   entry.CancelURL,
+		}
+
+		if _, err := entity.DB.NamedExec("UPDATE site SET name=:name, domain=:domain, callback_url=:callback_url, cancel_url=:cancel_url WHERE client_id=:client_id", &site); err != nil {
 			return nil, err
 		}
 
