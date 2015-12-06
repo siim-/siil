@@ -105,6 +105,14 @@ func NewSite(entry *Entry) (*Entity, error) {
 	}
 }
 
+func GetUsersSites(userID uint) ([]Entity, error) {
+	sites := []Entity{}
+	if err := entity.DB.Select(&sites, "SELECT * FROM site WHERE owner=?", userID); err != nil {
+		return nil, err
+	}
+	return sites, nil
+}
+
 func validEntry(entry *Entry) bool {
 	var (
 		nameRegex   string = "[A-Za-z1-9]+"

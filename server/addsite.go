@@ -5,16 +5,23 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/siim-/siil/entity/session"
 	"github.com/siim-/siil/entity/site"
 )
 
 func handleAddSiteForm(rw http.ResponseWriter, rq *http.Request) {
-	addForm(rw, rq, false)
+	if userLoggedIn(rq) {
+		addForm(rw, rq, false)
+	} else {
+		http.Redirect(rw, rq, "/api/signin/a1s2d34", http.StatusFound)
+	}
 }
 
 func handleAddSiteFormFailed(rw http.ResponseWriter, rq *http.Request) {
-	addForm(rw, rq, true)
+	if userLoggedIn(rq) {
+		addForm(rw, rq, true)
+	} else {
+		http.Redirect(rw, rq, "/api/signin/a1s2d34", http.StatusFound)
+	}
 }
 
 func handleAddSiteSuccess(rw http.ResponseWriter, rq *http.Request) {
@@ -54,27 +61,13 @@ func handleAddSiteRequest(rw http.ResponseWriter, rq *http.Request) {
 	http.Redirect(rw, rq, "/addsite/fail", http.StatusFound)
 }
 
-func addForm(rw http.ResponseWriter, rq *http.Request, lastFailed bool) {
+func addForm(rw http.ResponseWriter, rq *http.Request, displayError bool) {
 	response, err := templates["addsite.hbs"].Exec(map[string]interface{}{
-		"lastFailed": lastFailed,
+		"DisplayError": displayError,
 	})
 	if err != nil {
 		http.Error(rw, "Something broke", http.StatusInternalServerError)
 		return
 	}
 	rw.Write([]byte(response))
-}
-
-func getOwnerFromSession(rq *http.Request) (uint, error) {
-	cookie, err := rq.Cookie("token")
-	if err != nil {
-		return 0, err
-	}
-
-	session, err := session.GetSession(cookie.Value)
-	if err != nil {
-		return 0, err
-	}
-
-	return uint(session.UserId), nil
 }

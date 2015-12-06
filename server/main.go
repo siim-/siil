@@ -63,6 +63,9 @@ func StartAPIServer(c *cli.Context) {
 	baseRouter.HandleFunc("/addsite/success", handleAddSiteSuccess)
 	baseRouter.HandleFunc("/addsite/request", handleAddSiteRequest)
 
+	//Display sites
+	baseRouter.HandleFunc("/sites", handleSites)
+
 	//Invalidate sessions
 	baseRouter.HandleFunc("/signout/{token:[a-zA-Z0-9]*}", handleSignoutRequest)
 
