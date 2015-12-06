@@ -109,6 +109,14 @@ Vagrant.configure(2) do |config|
     ./revocationlists.sh
 
     cd ..
+
+    #Set the correct docker-compose file
+    cp docker-compose.yml.dev docker-compose.yml
+
+    #And apache2 conf
+    cp conf/apache2-vhosts/siil.conf.dev conf/apache2-vhosts/active/siil.conf
+
+    cp conf/apache2-vhosts/siil.conf.dev
     #Bring up supporting services
     docker-compose up -d
 
