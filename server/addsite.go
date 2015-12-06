@@ -10,11 +10,19 @@ import (
 )
 
 func handleAddSiteForm(rw http.ResponseWriter, rq *http.Request) {
-	addForm(rw, rq, false)
+	if userLoggedIn(rq) {
+		addForm(rw, rq, false)
+	} else {
+		http.Redirect(rw, rq, "/api/signin/a1s2d34", http.StatusFound)
+	}
 }
 
 func handleAddSiteFormFailed(rw http.ResponseWriter, rq *http.Request) {
-	addForm(rw, rq, true)
+	if userLoggedIn(rq) {
+		addForm(rw, rq, true)
+	} else {
+		http.Redirect(rw, rq, "/api/signin/a1s2d34", http.StatusFound)
+	}
 }
 
 func handleAddSiteSuccess(rw http.ResponseWriter, rq *http.Request) {
@@ -77,4 +85,13 @@ func getOwnerFromSession(rq *http.Request) (uint, error) {
 	}
 
 	return uint(session.UserId), nil
+}
+
+func userLoggedIn(rq *http.Request) bool {
+	_, err := getOwnerFromSession(rq)
+	if err != nil {
+		return false
+	} else {
+		return true
+	}
 }
