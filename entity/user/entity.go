@@ -41,6 +41,8 @@ func FindOrCreate(userCert *cert.Cert) (*Entity, error) {
 			}
 			if _, err := entity.DB.NamedExec("INSERT INTO user (code, first_name, last_name) VALUES (:code, :first_name, :last_name)", &usr); err != nil {
 				return nil, err
+			} else {
+				return FindOrCreate(userCert)
 			}
 		} else {
 			return nil, err

@@ -106,14 +106,13 @@ func handleSuccessRequest(rw http.ResponseWriter, rq *http.Request) {
 			if token := rq.FormValue("token"); len(token) != session.TOKEN_LENGTH {
 				http.Error(rw, "Invalid token provided", http.StatusBadRequest)
 			} else {
-				if sess, err := session.GetSession(token); err != nil {
+				if _, err := session.GetSession(token); err != nil {
 					log.Fatal(err)
 					http.Error(rw, "No session", http.StatusUnauthorized)
 				} else {
 					cookie := http.Cookie{
-						Name:    "token",
-						Value:   token,
-						Expires: sess.ExpiresAt,
+						Name:  "token",
+						Value: token,
 					}
 					http.SetCookie(rw, &cookie)
 					http.Redirect(rw, rq, "/", http.StatusFound)

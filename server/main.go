@@ -69,7 +69,7 @@ func StartAPIServer(c *cli.Context) {
 	//Invalidate sessions
 	baseRouter.HandleFunc("/signout/{token:[a-zA-Z0-9]*}", handleSignoutRequest)
 
-	baseRouter.HandleFunc("/api/session/{token:[a-zA-Z0-9]*}", handleAPISessionRequest)
+	baseRouter.HandleFunc("/api/session", handleAPISessionRequest)
 	baseRouter.HandleFunc("/api/me", handleAPIMeRequest)
 
 	http.ListenAndServe(fmt.Sprintf(":%d", port), baseRouter)

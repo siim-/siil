@@ -5,14 +5,14 @@
 		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
 	</head>
 	<body>
-		<div class="container" style="border-right: 1px solid #ccc;border-left: 1px solid #ccc;">
+		<div class="container">
 			<div class="row">
 				<div class="twelve columns" style="padding-left:15px;">
-				<h4>Sign in to {{Name}}</h4>
+				<h2>Sign in to {{Name}}</h2>
 				<div class="row">
 					<div class="twelve columns" style="text-align:left;">
 						<p>
-							{{Name}} ({{Domain}}) uses the Estonian ID card to authenticate users. Your full name & national id code will be provided to {{Name}} if you choose to continue.
+							{{Name}} ({{Domain}}) uses the Estonian ID card to authenticate users. Your full name & id code will be provided to {{Name}} if you choose to continue.
 						</p>
 					</div>
 				</div>
@@ -27,7 +27,7 @@
 					<button class="button disabled" type="button" disabled>Authenticate with mID</button>
 				</div>
 				<div class="four columns" style="text-align:center;">
-					<form action="{{CancelURL}}">
+					<form action="{{CancelURL}}" method="POST">
 						<button class="button" type="submit">Cancel</button>
 					</form>
 				</div>
