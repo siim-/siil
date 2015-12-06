@@ -24,3 +24,9 @@ _testmain.go
 *.prof
 
 .vagrant
+
+docker-compose.yml
+conf/apache2-vhosts/active
+certs/*.crl.*
+certs/*.pem.*
+certs/*.PEM.*
