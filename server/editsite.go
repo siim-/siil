@@ -22,7 +22,7 @@ func handleEditSiteForm(rw http.ResponseWriter, rq *http.Request) {
 	s, err := checkSiteAndUserConnetion(rq, siteId)
 	if err != nil {
 		log.Println(err)
-		http.Redirect(rw, rq, "/api/signin/a1s2d34", http.StatusFound)
+		http.Redirect(rw, rq, "/api/signin/" + site.SIIL_SITE_ID, http.StatusFound)
 		return
 	}
 	
@@ -41,7 +41,7 @@ func handleEditSiteFormFailed(rw http.ResponseWriter, rq *http.Request) {
 	s, err := checkSiteAndUserConnetion(rq, siteId)
 	if err != nil {
 		log.Println(err)
-		http.Redirect(rw, rq, "/api/signin/a1s2d34", http.StatusFound)
+		http.Redirect(rw, rq, "/api/signin/" + site.SIIL_SITE_ID, http.StatusFound)
 		return
 	}
 	

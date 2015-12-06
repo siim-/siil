@@ -77,11 +77,11 @@ func (e *Entity) HasActiveSessionFor(u *user.Entity) bool {
 
 func NewSite(entry *Entry) (*Entity, error) {
 	if validEntry(entry) {
-		clientID, err := createRandomKey(64)
+		clientID, err := createRandomKey(CLIENT_ID_LENGTH)
 		if err != nil {
 			return nil, err
 		}
-		privateKey, err := createRandomKey(128)
+		privateKey, err := createRandomKey(PRIVATE_KEY_LENGTH)
 		if err != nil {
 			return nil, err
 		}
