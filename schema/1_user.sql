@@ -6,6 +6,6 @@ CREATE TABLE user (
 	last_name VARCHAR(60) NOT NULL,
 	PRIMARY KEY (id),
 	UNIQUE UNQ_user_code (code)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE utf8_unicode_ci;
 
 INSERT INTO user (code, first_name, last_name) VALUES ('12345678987', 'Tester', 'Ester');
