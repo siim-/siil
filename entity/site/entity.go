@@ -42,7 +42,7 @@ type Entry struct {
 
 func (e *Entity) Load() error {
 	loaded := Entity{}
-	err := entity.DB.Get(&loaded, "SELECT * FROM site WHERE client_id=?", e.ClientId)
+	err := entity.DB.Get(&loaded, "SELECT * FROM site WHERE client_id=$1", e.ClientId)
 	if err != nil {
 		return err
 	}
@@ -95,6 +95,14 @@ func NewSite(entry *Entry) (*Entity, error) {
 	} else {
 		return nil, errors.New("Invalid entry.")
 	}
+}
+
+func GetUsersSites(userID uint) ([]Entity, error) {
+	sites := []Entity{}
+	if err := entity.DB.Select(&sites, "SELECT * FROM site WHERE owner=?", userID); err != nil {
+		return nil, err
+	}
+	return sites, nil
 }
 
 func validEntry(entry *Entry) bool {
