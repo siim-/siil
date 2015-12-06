@@ -108,22 +108,6 @@ func handleAPISessionRequest(rw http.ResponseWriter, rq *http.Request) {
 func handleAPIMeRequest(rw http.ResponseWriter, rq *http.Request) {
 	switch rq.Method {
 	case "GET":
-		if origin := rq.Header.Get("Origin"); len(origin) != 0 {
-			if u, err := url.Parse(origin); err != nil {
-				http.Error(rw, "Invalid origin provided", http.StatusBadRequest)
-				return
-			} else {
-				s := site.Entity{Domain: u.Host}
-				if err := s.Load(); err == nil {
-					rw.Header().Set("Access-Control-Allow-Origin", origin)
-					rw.Header().Set("Access-Control-Allow-Methods", "GET")
-					rw.Header().Set("Access-Control-Allow-Credentials", "true")
-				} else {
-					http.Error(rw, "Origin not allowed", http.StatusUnauthorized)
-					return
-				}
-			}
-		}
 		if !cert.ClientVerified(rq) {
 			http.Error(rw, "Certificate not provided", http.StatusBadRequest)
 		} else {
@@ -133,6 +117,23 @@ func handleAPIMeRequest(rw http.ResponseWriter, rq *http.Request) {
 				if clientId := rq.FormValue("client_id"); len(clientId) == 0 {
 					http.Error(rw, "Invalid client_id provided", http.StatusBadRequest)
 				} else {
+					//Check origin header validity
+					if origin := rq.Header.Get("Origin"); len(origin) != 0 {
+						if u, err := url.Parse(origin); err != nil {
+							http.Error(rw, "Invalid origin provided", http.StatusBadRequest)
+							return
+						} else {
+							s := site.Entity{Domain: u.Host}
+							if err := s.Load(); err == nil && s.ClientId == clientId {
+								rw.Header().Set("Access-Control-Allow-Origin", origin)
+								rw.Header().Set("Access-Control-Allow-Methods", "GET")
+								rw.Header().Set("Access-Control-Allow-Credentials", "true")
+							} else {
+								http.Error(rw, "Origin not allowed", http.StatusUnauthorized)
+								return
+							}
+						}
+					}
 					s := site.Entity{ClientId: clientId}
 					if err := s.Load(); err != nil {
 						http.Error(rw, "Invalid client_id provided", http.StatusBadRequest)

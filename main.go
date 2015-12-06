@@ -39,7 +39,7 @@ func main() {
 			Usage: "Working directory for the application",
 		},
 		cli.StringFlag{
-			Name: "site-id, sid",
+			Name:  "site-id, sid",
 			Value: "a1s2d34",
 			Usage: "Site ID for the Siil entry",
 		},
