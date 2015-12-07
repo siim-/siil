@@ -9,6 +9,7 @@ import (
 	"github.com/siim-/siil/entity"
 	"github.com/siim-/siil/entity/session"
 	"github.com/siim-/siil/entity/site"
+	"github.com/siim-/siil/entity/user"
 
 	"github.com/aymerick/raymond"
 	"github.com/codegangsta/cli"
@@ -52,6 +53,7 @@ func StartAPIServer(c *cli.Context) {
 	//Root endpoint doesn't really do anything
 	baseRouter.HandleFunc("/", handleRootRequest)
 	baseRouter.HandleFunc("/success", handleSuccessRequest)
+	baseRouter.HandleFunc("/fail", handleCancelRequest)
 
 	//User primer & authentication handlers
 	baseRouter.HandleFunc("/signin/{site:[a-zA-Z0-9]*}", handleSigninRequest)
@@ -62,9 +64,6 @@ func StartAPIServer(c *cli.Context) {
 	baseRouter.HandleFunc("/addsite/fail", handleAddSiteFormFailed)
 	baseRouter.HandleFunc("/addsite/success", handleAddSiteSuccess)
 	baseRouter.HandleFunc("/addsite/request", handleAddSiteRequest)
-
-	//Display sites
-	baseRouter.HandleFunc("/sites", handleSites)
 
 	//Edit site
 	baseRouter.HandleFunc("/editsite/success", handleEditSiteSuccess)
@@ -92,7 +91,59 @@ func handleRootRequest(rw http.ResponseWriter, rq *http.Request) {
 			authenticated = sess.SiteId == site.SIIL_SITE_ID
 		}
 	}
-	if t, err := templates["index.hbs"].Exec(map[string]interface{}{"authed": authenticated, "site_id": site.SIIL_SITE_ID, "token": token}); err != nil {
+
+	if authenticated {
+		owner, err := getOwnerFromSession(rq)
+		if err != nil {
+			log.Println(err)
+			http.Redirect(rw, rq, "/signin/"+site.SIIL_SITE_ID, http.StatusFound)
+			return
+		}
+
+		usr, err := user.FindById(int(owner))
+		if err != nil {
+			log.Println(err)
+			http.Error(rw, "Invalid user", http.StatusInternalServerError)
+			return
+		}
+
+		var sections string = ""
+		sites, err := site.GetUsersSites(owner)
+		if err != nil {
+			log.Println(err)
+			return
+		} else {
+			for _, s := range sites {
+				titleArea := surroundWithRow(title(s.Name) + button(s.ClientId))
+				descriptionListArea := surroundWithRow(surroundWithColumn(getDescriptionList(&s), "twelve"))
+				sections += surroundWithSection(titleArea + descriptionListArea)
+			}
+		}
+
+		response, err := templates["index.hbs"].Exec(map[string]interface{}{
+			"Sections":   sections,
+			"authed":     authenticated,
+			"first_name": usr.FirstName,
+			"last_name":  usr.LastName,
+			"site_id":    site.SIIL_SITE_ID,
+			"token":      token,
+		})
+		if err != nil {
+			http.Error(rw, "Something broke", http.StatusInternalServerError)
+		} else {
+			rw.Write([]byte(response))
+		}
+	} else {
+		if t, err := templates["index.hbs"].Exec(map[string]interface{}{"authed": authenticated, "site_id": site.SIIL_SITE_ID, "token": token}); err != nil {
+			http.Error(rw, "Something broke", http.StatusInternalServerError)
+		} else {
+			rw.Write([]byte(t))
+		}
+	}
+}
+
+func handleCancelRequest(rw http.ResponseWriter, rq *http.Request) {
+	if t, err := templates["cancel.hbs"].Exec(map[string]interface{}{"site_id": site.SIIL_SITE_ID}); err != nil {
 		http.Error(rw, "Something broke", http.StatusInternalServerError)
 	} else {
 		rw.Write([]byte(t))
