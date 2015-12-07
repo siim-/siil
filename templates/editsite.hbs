@@ -1,29 +1,29 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Siil - Add Site</title>
+		<title>Siil - Edit Site</title>
 		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
 	</head>
 	<body>
 		<div class="container">
 			<div class="row">
 				<br><br>
-				<h1>Add a site</h1>
+				<h1>Edit Site</h1>
 				{{#if DisplayError}}
 					<p style="color: red">Entered fields were bad.</p>
 				{{/if}}
-				<form action="/addsite/request" method="POST">
+				<form action="/editsite/{{ClientId}}/request" method="POST">
 				  Site name:<br>
-				  <input type="text" name="site-name">
+				  <input type="text" name="site-name" value="{{Name}}">
 				  <br>
 				  Domain name:<br>
-				  <input type="text" name="domain-name">
+				  <input type="text" name="domain-name" value="{{Domain}}">
 				  <br>
 				  Callback url:<br>
-				  <input type="text" name="callback-url">
+				  <input type="text" name="callback-url" value="{{CallbackURL}}">
 				  <br>
 				  Cancel url:<br>
-				  <input type="text" name="cancel-url">
+				  <input type="text" name="cancel-url" value="{{CancelURL}}">
 				  <br><br>
 				  <input type="submit" value="Submit">
 				</form>
