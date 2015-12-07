@@ -67,9 +67,9 @@ func StartAPIServer(c *cli.Context) {
 	baseRouter.HandleFunc("/sites", handleSites)
 
 	//Edit site
+	baseRouter.HandleFunc("/editsite/success", handleEditSiteSuccess)
 	baseRouter.HandleFunc("/editsite/{site:[a-zA-Z0-9]*}", handleEditSiteForm)
 	baseRouter.HandleFunc("/editsite/{site:[a-zA-Z0-9]*}/fail", handleEditSiteFormFailed)
-	baseRouter.HandleFunc("/editsite/success", handleEditSiteSuccess)
 	baseRouter.HandleFunc("/editsite/{site:[a-zA-Z0-9]*}/request", handleEditSiteRequest)
 
 	//Invalidate sessions

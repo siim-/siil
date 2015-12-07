@@ -22,10 +22,10 @@ func handleEditSiteForm(rw http.ResponseWriter, rq *http.Request) {
 	s, err := checkSiteAndUserConnetion(rq, siteId)
 	if err != nil {
 		log.Println(err)
-		http.Redirect(rw, rq, "/api/signin/" + site.SIIL_SITE_ID, http.StatusFound)
+		http.Redirect(rw, rq, "/signin/"+site.SIIL_SITE_ID, http.StatusFound)
 		return
 	}
-	
+
 	editForm(s, rw, rq, false)
 }
 
@@ -41,10 +41,10 @@ func handleEditSiteFormFailed(rw http.ResponseWriter, rq *http.Request) {
 	s, err := checkSiteAndUserConnetion(rq, siteId)
 	if err != nil {
 		log.Println(err)
-		http.Redirect(rw, rq, "/api/signin/" + site.SIIL_SITE_ID, http.StatusFound)
+		http.Redirect(rw, rq, "/signin/"+site.SIIL_SITE_ID, http.StatusFound)
 		return
 	}
-	
+
 	editForm(s, rw, rq, true)
 }
 
@@ -68,7 +68,7 @@ func handleEditSiteRequest(rw http.ResponseWriter, rq *http.Request) {
 	s, err := checkSiteAndUserConnetion(rq, siteId)
 	if err != nil {
 		log.Println(err)
-		http.Redirect(rw, rq, "/editsite/" + siteId + "/fail", http.StatusFound)
+		http.Redirect(rw, rq, "/editsite/"+siteId+"/fail", http.StatusFound)
 		return
 	}
 
@@ -77,7 +77,7 @@ func handleEditSiteRequest(rw http.ResponseWriter, rq *http.Request) {
 	err = rq.ParseForm()
 	if err != nil {
 		log.Println(err)
-		http.Redirect(rw, rq, "/editsite/" + siteId + "/fail", http.StatusFound)
+		http.Redirect(rw, rq, "/editsite/"+siteId+"/fail", http.StatusFound)
 		return
 	} else {
 		params = rq.PostForm
@@ -101,7 +101,7 @@ func handleEditSiteRequest(rw http.ResponseWriter, rq *http.Request) {
 		}
 	}
 
-	http.Redirect(rw, rq, "/editsite/" + siteId + "/fail", http.StatusFound)
+	http.Redirect(rw, rq, "/editsite/"+siteId+"/fail", http.StatusFound)
 }
 
 func editForm(s *site.Entity, rw http.ResponseWriter, rq *http.Request, displayError bool) {
@@ -122,13 +122,15 @@ func editForm(s *site.Entity, rw http.ResponseWriter, rq *http.Request, displayE
 
 func checkSiteAndUserConnetion(rq *http.Request, siteId string) (*site.Entity, error) {
 	owner, err := getOwnerFromSession(rq)
-	if err != nil {		
+	if err != nil {
 		return nil, err
 	}
 
-	s := site.Entity{}
-	s.ClientId = siteId
-	s.Load()
+	s := site.Entity{ClientId: siteId}
+	if err := s.Load(); err != nil {
+		log.Println(err)
+		return nil, errors.New("Failed to find site")
+	}
 
 	if s.Owner != owner {
 		return nil, errors.New("Site owner doesn't match session owner.")

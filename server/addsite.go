@@ -12,7 +12,7 @@ func handleAddSiteForm(rw http.ResponseWriter, rq *http.Request) {
 	if userLoggedIn(rq) {
 		addForm(rw, rq, false)
 	} else {
-		http.Redirect(rw, rq, "/api/signin/" + site.SIIL_SITE_ID, http.StatusFound)
+		http.Redirect(rw, rq, "/api/signin/"+site.SIIL_SITE_ID, http.StatusFound)
 	}
 }
 
@@ -20,7 +20,7 @@ func handleAddSiteFormFailed(rw http.ResponseWriter, rq *http.Request) {
 	if userLoggedIn(rq) {
 		addForm(rw, rq, true)
 	} else {
-		http.Redirect(rw, rq, "/api/signin/" + site.SIIL_SITE_ID, http.StatusFound)
+		http.Redirect(rw, rq, "/api/signin/"+site.SIIL_SITE_ID, http.StatusFound)
 	}
 }
 
